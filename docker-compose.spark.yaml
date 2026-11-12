@@ -1,0 +1,18 @@
+services:
+  spark-master:
+    image: spark:4.0.1-java21-python3
+    hostname: spark-master
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master", "--host", "spark-master"]
+    ports:
+      - "127.0.0.1:8081:8080"
+    volumes:
+      - ./jobs:/jobs:ro
+      - ./data:/data:ro
+
+  spark-worker:
+    image: spark:4.0.1-java21-python3
+    depends_on:
+      - spark-master
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "--cores", "1", "--memory", "1g", "spark://spark-master:7077"]
+    volumes:
+      - ./data:/data:ro
